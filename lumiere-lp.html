@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIÈRE — Fine Dining</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400&family=Noto+Serif+JP:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #c9a96e;
+    --gold-light: #e8d5a3;
+    --gold-dim: rgba(201,169,110,0.15);
+    --cream: #f5f0e8;
+    --dark: #0a0906;
+    --dark-2: #120f0a;
+    --dark-3: #1c1711;
+    --text-muted: rgba(245,240,232,0.45);
+    --text-mid: rgba(245,240,232,0.7);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--cream);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,169,110,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.25s ease, width 0.3s, height 0.3s, border-color 0.3s;
+  }
+  body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring {
+    width: 56px; height: 56px;
+    border-color: var(--gold);
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 28px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    mix-blend-mode: normal;
+  }
+  nav::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(10,9,6,0.95) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-links {
+    display: flex;
+    gap: 44px;
+    list-style: none;
+    position: relative;
+  }
+  .nav-links a {
+    color: var(--text-mid);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-reserve {
+    position: relative;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border: 1px solid rgba(201,169,110,0.4);
+    padding: 10px 22px;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .nav-reserve:hover {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 120px 60px 100px;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 1s 0.3s forwards;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(72px, 8vw, 120px);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .hero-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 56px;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+  }
+  .hero-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    opacity: 0;
+    animation: fadeUp 1s 0.9s forwards;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--dark);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 16px 36px;
+    font-weight: 400;
+    transition: background 0.3s, transform 0.3s;
+    display: inline-block;
+  }
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+  }
+  .btn-ghost {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: color 0.3s;
+  }
+  .btn-ghost::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.3s;
+  }
+  .btn-ghost:hover { color: var(--cream); }
+  .btn-ghost:hover::after { width: 60px; }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-image-area {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 60%, rgba(201,169,110,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(139,100,50,0.1) 0%, transparent 50%),
+      linear-gradient(135deg, #1c1409 0%, #0d0b07 100%);
+  }
+  /* Decorative plate/dish illustration via CSS */
+  .hero-plate {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 380px;
+    height: 380px;
+    opacity: 0;
+    animation: fadeIn 1.5s 1s forwards;
+  }
+  .plate-outer {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.2);
+  }
+  .plate-mid {
+    position: absolute;
+    inset: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.35);
+    background: radial-gradient(ellipse at 40% 35%, rgba(201,169,110,0.07) 0%, transparent 60%);
+  }
+  .plate-inner {
+    position: absolute;
+    inset: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.5);
+    background: radial-gradient(ellipse at 35% 30%, rgba(201,169,110,0.15) 0%, rgba(201,169,110,0.02) 50%, transparent 70%);
+  }
+  .plate-center {
+    position: absolute;
+    inset: 100px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 40% 35%, rgba(201,169,110,0.25) 0%, rgba(140,100,50,0.1) 40%, transparent 70%),
+      radial-gradient(circle, rgba(201,169,110,0.05) 0%, transparent 100%);
+    box-shadow: inset 0 20px 60px rgba(201,169,110,0.08);
+  }
+  /* Food accent lines */
+  .plate-garnish {
+    position: absolute;
+    inset: 120px;
+    border-radius: 50%;
+  }
+  .plate-garnish::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 20%;
+    width: 60%; height: 2px;
+    background: linear-gradient(to right, transparent, rgba(201,169,110,0.6), transparent);
+    transform: rotate(-15deg);
+    border-radius: 2px;
+  }
+  .plate-garnish::after {
+    content: '';
+    position: absolute;
+    top: 30%; left: 30%;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 20px 18px 0 rgba(201,169,110,0.5), 35px 5px 0 rgba(201,169,110,0.3);
+  }
+
+  .hero-number {
+    position: absolute;
+    bottom: 60px;
+    right: 40px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 180px;
+    font-weight: 300;
+    color: rgba(201,169,110,0.06);
+    line-height: 1;
+    user-select: none;
+    letter-spacing: -0.05em;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 60px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0;
+    animation: fadeIn 1s 1.4s forwards;
+  }
+  .scroll-line {
+    width: 40px;
+    height: 1px;
+    background: var(--text-muted);
+    animation: scrollLine 2s 1.6s infinite;
+  }
+  @keyframes scrollLine {
+    0% { transform: scaleX(0); transform-origin: left; }
+    50% { transform: scaleX(1); transform-origin: left; }
+    51% { transform: scaleX(1); transform-origin: right; }
+    100% { transform: scaleX(0); transform-origin: right; }
+  }
+
+  /* DIVIDER */
+  .gold-divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 60px;
+    margin: 0 auto;
+  }
+  .gold-divider::before, .gold-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,169,110,0.4));
+  }
+  .gold-divider::after {
+    background: linear-gradient(to left, transparent, rgba(201,169,110,0.4));
+  }
+  .divider-diamond {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  /* CONCEPT */
+  .concept {
+    padding: 120px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .concept-label {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .concept-label::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+  .concept-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4vw, 58px);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 32px;
+  }
+  .concept-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .concept-body {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    font-weight: 200;
+    line-height: 2.2;
+    color: var(--text-mid);
+    margin-bottom: 24px;
+  }
+  .concept-visual {
+    position: relative;
+    aspect-ratio: 3/4;
+    max-height: 560px;
+  }
+  .concept-visual-inner {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 40% 30%, rgba(201,169,110,0.18) 0%, transparent 55%),
+      linear-gradient(160deg, #1e170d 0%, #0f0c08 60%, #1a1208 100%);
+    border: 1px solid rgba(201,169,110,0.15);
+  }
+  .concept-visual-inner::before {
+    content: '';
+    position: absolute;
+    top: 40px; left: 40px; right: 40px; bottom: 40px;
+    border: 1px solid rgba(201,169,110,0.08);
+  }
+  .concept-visual-text {
+    position: absolute;
+    bottom: 36px; left: 36px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 72px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(201,169,110,0.12);
+    line-height: 1;
+  }
+  .concept-accent {
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 120px; height: 120px;
+    border: 1px solid rgba(201,169,110,0.25);
+    border-radius: 50%;
+  }
+  .concept-accent::before {
+    content: '';
+    position: absolute;
+    inset: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.15);
+  }
+
+  /* STATS */
+  .stats {
+    border-top: 1px solid rgba(201,169,110,0.1);
+    border-bottom: 1px solid rgba(201,169,110,0.1);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0 60px;
+  }
+  .stat-item {
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+  }
+  .stat-item + .stat-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 20%; bottom: 20%;
+    width: 1px;
+    background: rgba(201,169,110,0.15);
+  }
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .stat-number sup {
+    font-size: 0.35em;
+    vertical-align: super;
+  }
+  .stat-label {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 12px;
+    font-weight: 200;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+  }
+
+  /* MENU */
+  .menu-section {
+    padding: 120px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 70px;
+  }
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 4.5vw, 64px);
+    font-weight: 300;
+    line-height: 1;
+  }
+  .section-link {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(201,169,110,0.3);
+    transition: gap 0.3s;
+  }
+  .section-link:hover { gap: 20px; }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: rgba(201,169,110,0.08);
+  }
+  .menu-item {
+    background: var(--dark);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+  }
+  .menu-item:hover { background: var(--dark-3); }
+  .menu-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+  }
+  .menu-item:hover::before { transform: scaleX(1); }
+  .menu-course {
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+  .menu-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 300;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .menu-name-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    font-weight: 200;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+  }
+  .menu-desc {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 12px;
+    font-weight: 200;
+    line-height: 1.9;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+  }
+  .menu-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--gold-light);
+    letter-spacing: 0.05em;
+  }
+  .menu-price span {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* EXPERIENCE */
+  .experience {
+    padding: 120px 60px;
+    background: var(--dark-2);
+    position: relative;
+    overflow: hidden;
+  }
+  .experience::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,169,110,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .experience-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .experience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    margin-top: 70px;
+  }
+  .exp-block { position: relative; }
+  .exp-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 100px;
+    font-weight: 300;
+    color: rgba(201,169,110,0.07);
+    line-height: 1;
+    position: absolute;
+    top: -20px; left: -10px;
+    user-select: none;
+  }
+  .exp-content { position: relative; padding-top: 32px; }
+  .exp-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 300;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .exp-title em { font-style: italic; color: var(--gold); }
+  .exp-body {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    font-weight: 200;
+    line-height: 2.1;
+    color: var(--text-mid);
+  }
+
+  /* RESERVATION */
+  .reservation {
+    padding: 140px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .reservation::before {
+    content: 'LUMIÈRE';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: min(18vw, 240px);
+    font-weight: 300;
+    color: rgba(201,169,110,0.03);
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    user-select: none;
+  }
+  .reservation-label {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+  }
+  .reservation-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .reservation-title em { font-style: italic; color: var(--gold); }
+  .reservation-body {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    font-weight: 200;
+    color: var(--text-muted);
+    line-height: 2;
+    margin-bottom: 56px;
+    position: relative;
+  }
+  .reservation-form {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-input {
+    width: 100%;
+    background: rgba(201,169,110,0.04);
+    border: 1px solid rgba(201,169,110,0.2);
+    color: var(--cream);
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    padding: 16px 20px;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+    appearance: none;
+  }
+  .form-input::placeholder { color: var(--text-muted); }
+  .form-input:focus {
+    border-color: var(--gold);
+    background: rgba(201,169,110,0.07);
+  }
+  .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23c9a96e' stroke-width='1'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    cursor: pointer;
+  }
+  .form-select option { background: var(--dark-2); }
+  .btn-reserve {
+    background: var(--gold);
+    color: var(--dark);
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    font-weight: 400;
+    border: none;
+    padding: 18px 40px;
+    cursor: none;
+    transition: background 0.3s, transform 0.3s;
+    width: 100%;
+  }
+  .btn-reserve:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+  }
+
+  /* ACCESS */
+  .access {
+    padding: 100px 60px;
+    background: var(--dark-2);
+    border-top: 1px solid rgba(201,169,110,0.1);
+  }
+  .access-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .access-map {
+    aspect-ratio: 4/3;
+    background:
+      linear-gradient(rgba(10,9,6,0.6), rgba(10,9,6,0.6)),
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(201,169,110,0.05) 40px, rgba(201,169,110,0.05) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(201,169,110,0.05) 40px, rgba(201,169,110,0.05) 41px);
+    border: 1px solid rgba(201,169,110,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .map-pin {
+    width: 16px; height: 16px;
+    background: var(--gold);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    position: relative;
+    box-shadow: 0 0 0 4px rgba(201,169,110,0.2), 0 0 0 8px rgba(201,169,110,0.1);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(201,169,110,0.2), 0 0 0 8px rgba(201,169,110,0.1); }
+    50% { box-shadow: 0 0 0 6px rgba(201,169,110,0.3), 0 0 0 14px rgba(201,169,110,0.05); }
+  }
+  .access-info { padding-top: 10px; }
+  .access-item {
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(201,169,110,0.08);
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 20px;
+  }
+  .access-key {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding-top: 2px;
+  }
+  .access-value {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    font-weight: 200;
+    color: var(--text-mid);
+    line-height: 1.9;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 60px;
+    border-top: 1px solid rgba(201,169,110,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+  }
+  .footer-copy {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+  }
+  .footer-sns {
+    display: flex;
+    gap: 24px;
+  }
+  .footer-sns a {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-sns a:hover { color: var(--gold); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">LUMIÈRE</a>
+  <ul class="nav-links">
+    <li><a href="#concept">コンセプト</a></li>
+    <li><a href="#menu">メニュー</a></li>
+    <li><a href="#experience">体験</a></li>
+    <li><a href="#access">アクセス</a></li>
+  </ul>
+  <a href="#reserve" class="nav-reserve">ご予約</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">東京・銀座 ── Fine Dining</p>
+    <h1 class="hero-title">LU<em>MI</em><br>ÈRE</h1>
+    <p class="hero-subtitle">光の饗宴、静寂の美食</p>
+    <div class="hero-cta-group">
+      <a href="#reserve" class="btn-primary">ご予約はこちら</a>
+      <a href="#menu" class="btn-ghost">Menu</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-image-area"></div>
+    <div class="hero-plate">
+      <div class="plate-outer"></div>
+      <div class="plate-mid"></div>
+      <div class="plate-inner"></div>
+      <div class="plate-center"></div>
+      <div class="plate-garnish"></div>
+    </div>
+    <div class="hero-number">01</div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- CONCEPT -->
+<section class="concept" id="concept">
+  <div>
+    <div class="concept-label reveal">コンセプト</div>
+    <h2 class="concept-title reveal reveal-delay-1">
+      フランスの精神と<br>イタリアの<em>魂</em>が<br>交わる場所
+    </h2>
+    <p class="concept-body reveal reveal-delay-2">
+      LUMIÈREは、フランス料理の緻密な技法とイタリア料理の豊かな素材感を融合させた、唯一無二のガストロノミーを提供します。シェフ・田中宙が厳選した国内外の食材が、光のように煌めく一皿へと昇華されます。
+    </p>
+    <p class="concept-body reveal reveal-delay-3">
+      静謐な空間の中で、料理・ワイン・サービスが三位一体となり、忘れ得ぬ夜のひとときをお届けします。
+    </p>
+  </div>
+  <div class="concept-visual reveal reveal-delay-2">
+    <div class="concept-visual-inner">
+      <div class="concept-visual-text">L</div>
+    </div>
+    <div class="concept-accent"></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item reveal">
+    <div class="stat-number">20<sup>+</sup></div>
+    <div class="stat-label">年の歴史</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-1">
+    <div class="stat-number">3</div>
+    <div class="stat-label">ミシュランスター</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-2">
+    <div class="stat-number">8</div>
+    <div class="stat-label">テーブル限定</div>
+  </div>
+</div>
+
+<!-- MENU -->
+<section class="menu-section" id="menu">
+  <div class="section-header">
+    <div>
+      <div class="section-label reveal">シグネチャーコース</div>
+      <h2 class="section-title reveal reveal-delay-1">Menu</h2>
+    </div>
+    <a href="#reserve" class="section-link reveal">Full Menu →</a>
+  </div>
+
+  <div class="menu-grid">
+    <div class="menu-item reveal">
+      <div class="menu-course">Amuse-Bouche</div>
+      <div class="menu-name">Caviar et Crème</div>
+      <div class="menu-name-jp">キャビアとクレーム</div>
+      <div class="menu-desc">国産キャビアをのせた、北海道産生クリームのコンソメジュレ。口溶けの瞬間に広がる塩味と甘みの対話。</div>
+    </div>
+    <div class="menu-item reveal reveal-delay-1">
+      <div class="menu-course">Entrée</div>
+      <div class="menu-name">Foie Gras Terrina</div>
+      <div class="menu-name-jp">フォアグラのテリーヌ</div>
+      <div class="menu-desc">フランス産フォアグラをイタリアのバルサミコで仕上げたテリーヌ。無花果のコンフィチュールと。</div>
+    </div>
+    <div class="menu-item reveal reveal-delay-2">
+      <div class="menu-course">Poisson</div>
+      <div class="menu-name">Dover Sole Meunière</div>
+      <div class="menu-name-jp">舌平目のムニエル</div>
+      <div class="menu-desc">イギリス産ドーバーソールをブールノワゼットで仕上げ、トリュフとケッパーを添えて。</div>
+    </div>
+    <div class="menu-item reveal">
+      <div class="menu-course">Pasta</div>
+      <div class="menu-name">Tajarin al Tartufo</div>
+      <div class="menu-name-jp">タヤリン トリュフ</div>
+      <div class="menu-desc">ピエモンテの卵黄パスタ・タヤリンに、白トリュフをたっぷりと削りかけた芳醇の一皿。</div>
+    </div>
+    <div class="menu-item reveal reveal-delay-1">
+      <div class="menu-course">Viande</div>
+      <div class="menu-name">Wagyu en Croûte</div>
+      <div class="menu-name-jp">和牛のアンクルート</div>
+      <div class="menu-desc">A5等級黒毛和牛をパイ包み焼きに。ペリグーソースとフランス産フォアグラのデュクセルとともに。</div>
+    </div>
+    <div class="menu-item reveal reveal-delay-2">
+      <div class="menu-course">Dessert</div>
+      <div class="menu-name">Île Flottante Dorée</div>
+      <div class="menu-name-jp">黄金のウフ ア ラ ネージュ</div>
+      <div class="menu-desc">金箔をまとったメレンゲを、バニラビーンズたっぷりのクレームアングレーズに浮かべた幻想的なデザート。</div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top: 60px; reveal">
+    <p style="font-family:'Noto Serif JP',serif; font-size:13px; color:var(--text-muted); margin-bottom:24px; font-weight:200;">
+      おまかせコース ¥38,500（税・サ込）/ ペアリングワイン ¥18,000〜
+    </p>
+    <a href="#reserve" class="btn-primary" style="display:inline-block;">コースを予約する</a>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="experience" id="experience">
+  <div class="experience-inner">
+    <div class="section-label reveal">体験</div>
+    <h2 class="section-title reveal reveal-delay-1">Experience</h2>
+    <div class="experience-grid">
+      <div class="exp-block reveal">
+        <div class="exp-number">01</div>
+        <div class="exp-content">
+          <h3 class="exp-title">空間が語る<em>物語</em></h3>
+          <p class="exp-body">銀座の夜景を一望できる8階のダイニングルームは、わずか8テーブルのみ。著名インテリアデザイナー・山本凛によるダークウォールナットと真鍮の空間は、まるで光の彫刻のようです。</p>
+        </div>
+      </div>
+      <div class="exp-block reveal reveal-delay-1">
+        <div class="exp-number">02</div>
+        <div class="exp-content">
+          <h3 class="exp-title">ソムリエが紡ぐ<em>対話</em></h3>
+          <p class="exp-body">ブルゴーニュ・トスカーナを中心に、1,200本以上のワインセラーからソムリエが最適なペアリングをご提案。ワインではなく、料理との「対話」をデザインします。</p>
+        </div>
+      </div>
+      <div class="exp-block reveal reveal-delay-2">
+        <div class="exp-number">03</div>
+        <div class="exp-content">
+          <h3 class="exp-title">シェフズテーブルの<em>特権</em></h3>
+          <p class="exp-body">ご要望によりキッチン内のシェフズテーブルをご用意。田中シェフの手技を間近に感じながら、その日限りの特別メニューで究極の一夜を。</p>
+        </div>
+      </div>
+      <div class="exp-block reveal reveal-delay-3">
+        <div class="exp-number">04</div>
+        <div class="exp-content">
+          <h3 class="exp-title">記念日を<em>芸術</em>に</h3>
+          <p class="exp-body">バースデー・アニバーサリー・プロポーズに特化したプランナーが専任でサポート。フラワー・メッセージデザート・チャンパーニュなど、細部まで心を込めて設計します。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVATION -->
+<section class="reservation" id="reserve">
+  <div class="reservation-label reveal">ご予約</div>
+  <h2 class="reservation-title reveal reveal-delay-1">
+    特別な夜を<br><em>ご予約ください</em>
+  </h2>
+  <p class="reservation-body reveal reveal-delay-2">
+    完全予約制・8席限定。<br>ご予約はオンラインまたはお電話にて承っております。
+  </p>
+  <div class="reservation-form reveal reveal-delay-3">
+    <div class="form-row">
+      <input type="text" class="form-input" placeholder="お名前">
+      <input type="tel" class="form-input" placeholder="電話番号">
+    </div>
+    <div class="form-row">
+      <input type="date" class="form-input">
+      <select class="form-input form-select">
+        <option value="">人数</option>
+        <option>2名</option>
+        <option>3名</option>
+        <option>4名</option>
+        <option>その他</option>
+      </select>
+    </div>
+    <select class="form-input form-select">
+      <option value="">ご利用シーン</option>
+      <option>ディナー（通常）</option>
+      <option>記念日・アニバーサリー</option>
+      <option>プロポーズ</option>
+      <option>接待・会食</option>
+      <option>シェフズテーブル</option>
+    </select>
+    <button class="btn-reserve">予約リクエストを送る</button>
+    <p style="font-size:11px; color:var(--text-muted); text-align:center; letter-spacing:0.1em;">または Tel: 03-0000-0000（12:00〜20:00）</p>
+  </div>
+</section>
+
+<!-- ACCESS -->
+<section class="access" id="access">
+  <div class="access-inner">
+    <div class="access-map">
+      <div class="map-pin"></div>
+    </div>
+    <div class="access-info">
+      <div class="section-label reveal" style="margin-bottom:32px;">アクセス</div>
+      <div class="access-item reveal">
+        <div class="access-key">住所</div>
+        <div class="access-value">東京都中央区銀座5-0-0<br>銀座プレミアムタワー 8F</div>
+      </div>
+      <div class="access-item reveal reveal-delay-1">
+        <div class="access-key">最寄駅</div>
+        <div class="access-value">東京メトロ銀座線「銀座」駅<br>A2出口より徒歩2分</div>
+      </div>
+      <div class="access-item reveal reveal-delay-2">
+        <div class="access-key">営業時間</div>
+        <div class="access-value">ディナー 18:00〜23:00（L.O. 20:00）<br>定休日：月曜日・火曜日</div>
+      </div>
+      <div class="access-item reveal reveal-delay-3">
+        <div class="access-key">お電話</div>
+        <div class="access-value">03-0000-0000</div>
+      </div>
+      <div class="access-item reveal" style="border-bottom:none;">
+        <div class="access-key">駐車場</div>
+        <div class="access-value">近隣提携駐車場をご利用ください<br>（2時間無料券をご用意）</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">LUMIÈRE</div>
+  <p class="footer-copy">© 2025 LUMIÈRE. All rights reserved.</p>
+  <div class="footer-sns">
+    <a href="#">Instagram</a>
+    <a href="#">Facebook</a>
+    <a href="#">LINE</a>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.backdropFilter = window.scrollY > 50 ? 'blur(12px)' : 'none';
+  });
+</script>
+</body>
+</html>
